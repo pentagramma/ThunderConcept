@@ -217,7 +217,7 @@ function App() {
         <div className="flex justify-center items-center">
           <ul className={`flex justify-center gap-4 mt-5 text-sm font-abc ${cityColor} font-bold`}>
             {shortcutCities.map((city) =>
-              <li key={city} className={`cursor-pointer hover:scale-105 duration-150 p-1 ${selectedCity === city || (apiData && apiData.name === city) ? 'border bg-gray-300 border-gray-500 rounded-md' : ''}`}>
+              <li key={city} className={`cursor-pointer p-1 ${selectedCity === city || (apiData && apiData.name === city) ? 'border text-white border-gray-300 bg-black rounded-md' : ''}`}>
                 <button
 
                   onClick={() => handleClickCity(city)}>
