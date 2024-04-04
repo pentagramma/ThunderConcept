@@ -195,7 +195,7 @@ function App() {
     <div
       className={`bg-gradient-to-b ${bgColor} place-items-center grid h-screen`}>
       <div
-        className='bg-white w-96 p-3 rounded-md shadow-xl hover:scale-105 duration-150 h-fit'
+        className='bg-white w-96 p-3 rounded-md shadow-xl h-fit'
 
       >
 
@@ -215,7 +215,7 @@ function App() {
 
         </div>
         <div className="flex justify-center items-center">
-          <ul className={`flex justify-center gap-4 mt-5 text-sm font-abc ${cityColor} font-bold`}>
+          <ul className={`flex justify-center gap-4 mt-5 text-sm  font-abc ${cityColor} font-bold`}>
             {shortcutCities.map((city) =>
               <li key={city} className={`cursor-pointer p-1 ${selectedCity === city || (apiData && apiData.name === city) ? 'border text-white border-gray-300 bg-black rounded-md' : ''}`}>
                 <button
