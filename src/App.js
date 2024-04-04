@@ -1,6 +1,6 @@
 
 import { IoMdSearch } from "react-icons/io";
-import { IoWarningOutline } from "react-icons/io5";
+import { IoWarningOutline, IoLocationOutline } from "react-icons/io5";
 
 import { FaTemperatureThreeQuarters, FaTemperatureEmpty, FaTemperatureFull, FaTemperatureQuarter } from "react-icons/fa6";
 
@@ -188,6 +188,40 @@ function App() {
     return Math.round((tempInKelvin - 273.15) * 1.8 + 32);
   }
 
+  const fetchWeatherByLocation = async () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      const URL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${Api_key}`;
+      try {
+        const response = await fetch(URL);
+        const data = await response.json();
+        setLoading(false);
+        setApiData(data);
+        console.log(data);
+
+        const weatherType = data.weather[0].main;
+        const selectedWeather = weatherTypes.find((weather) => weather.type === weatherType);
+        setError(null);
+        setShowWeather([selectedWeather]);
+        setSelectedCity(null);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+        setError("Error fetching data");
+      }
+    }, (error) => {
+      console.error('Error fetching location:', error);
+      setLoading(false);
+      setError("Unable to retrieve your location");
+    });
+  };
+
 
   return (
 
@@ -207,11 +241,23 @@ function App() {
             ref={inputRef}
             placeholder='Enter Location' className='text-xl p-1 font-semibold uppercase outline-none font-abc'
             onKeyDown={handleKeyDown} />
-          <button
-            onClick={fetchWeather}
-            className={`text-3xl ${searchColor} hover:scale-125 duration-200`}>
-            <IoMdSearch />
-          </button>
+          <div className="flex justify-center items-center">
+
+            <button
+              onClick={fetchWeather}
+              className={`text-3xl ${searchColor} mx-2 hover:scale-125 duration-200`}
+            >
+              <IoMdSearch />
+            </button>
+
+            <button
+              className={`text-2xl mr-1 hover:scale-125 duration-200 ${searchColor}`}
+              onClick={fetchWeatherByLocation}
+            >
+              <IoLocationOutline />
+
+            </button>
+          </div>
 
         </div>
         <div className="flex justify-center items-center">
@@ -229,7 +275,7 @@ function App() {
 
         </div>
         <div>
-          {error && <div className="text-red-500 flex justify-center"><IoWarningOutline className="h-6 mr-1" />
+          {error && !selectedCity && <div className="text-red-500 flex justify-center"><IoWarningOutline className="h-6 mr-1" />
             {error}</div>}
           {
             loading ? (
