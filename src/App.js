@@ -16,6 +16,9 @@ function App() {
   const [bgColor, setBgColor] = useState('');
   const [searchColor, setSearchColor] = useState('');
   const [cityColor, setCityColor] = useState('');
+  const [isCelsius, setIsCelsius] = useState(true);
+  const [shortcutCities] = useState(["Mumbai", "Delhi", "Assam", "Hyderabad", "Pune"]);
+  const [selectedCity, setSelectedCity] = useState();
 
 
   const weatherTypes = [
@@ -69,6 +72,7 @@ function App() {
       const selectedWeather = weatherTypes.find((weather) => weather.type === weatherType);
       setError(null);
       setShowWeather([selectedWeather]);
+      setSelectedCity(city);
     } catch (error) {
       console.error('Error fetching data:', error);
       setLoading(false);
@@ -79,6 +83,7 @@ function App() {
   const handleClickCity = (city) => {
 
     fetchWeatherByCity(city);
+
   }
 
 
@@ -120,6 +125,11 @@ function App() {
 
   useEffect(() => {
     setSearchColor(getSearchColor(Math.round(apiData?.main?.temp - 273.15)))
+  }, [apiData]);
+
+  useEffect(() => {
+    setSelectedCity(null);
+
   }, [apiData]);
 
   const fetchWeather = async () => {
@@ -166,6 +176,18 @@ function App() {
     }
   };
 
+  const handleTemperatureConversion = () => {
+    setIsCelsius((prev) => !prev);
+  };
+
+  const convertToCelsius = (tempInKelvin) => {
+    return Math.round(tempInKelvin - 273.15);
+  };
+
+  const convertToFahrenheit = (tempInKelvin) => {
+    return Math.round((tempInKelvin - 273.15) * 1.8 + 32);
+  }
+
 
   return (
 
@@ -194,35 +216,15 @@ function App() {
         </div>
         <div className="flex justify-center items-center">
           <ul className={`flex justify-center gap-4 mt-5 text-sm font-abc ${cityColor} font-bold`}>
-            <li className="cursor-pointer hover:scale-105 duration-150">
-              <button onClick={() => handleClickCity('Mumbai')}>
-                MUMBAI
-              </button>
-            </li>
-            <li className="cursor-pointer hover:scale-105 duration-150">
-              <button
-                onClick={() => handleClickCity('Delhi')}>
-                DELHI
-              </button>
-            </li>
-            <li className="cursor-pointer hover:scale-105 duration-150">
-              <button
-                onClick={() => handleClickCity('Assam')}>
-                ASSAM
-              </button>
-            </li>
-            <li className="cursor-pointer hover:scale-105 duration-150">
-              <button
-                onClick={() => handleClickCity('Bangalore')}>
-                BANGALORE
-              </button>
-            </li>
-            <li className="cursor-pointer hover:scale-105 duration-150">
-              <button
-                onClick={() => handleClickCity('Pune')}>
-                PUNE
-              </button>
-            </li>
+            {shortcutCities.map((city) =>
+              <li key={city} className={`cursor-pointer hover:scale-105 duration-150 p-1 ${selectedCity === city || (apiData && apiData.name === city) ? 'border bg-gray-300 border-gray-500 rounded-md' : ''}`}>
+                <button
+
+                  onClick={() => handleClickCity(city)}>
+                  {city}
+                </button>
+              </li>
+            )}
           </ul>
 
         </div>
@@ -232,7 +234,7 @@ function App() {
           {
             loading ? (
               <div
-                className="flex items-center justify-center h-[460px]"
+                className="flex items-center justify-center h-[469px]"
               >
                 <img src="https://cdn.dribbble.com/users/2973561/screenshots/5757826/loading__.gif" alt=""
                   className="justify-center"
@@ -267,8 +269,15 @@ function App() {
                         }
 
                         <h2 className="font-bold text-4xl p-3">
-                          {apiData?.main?.temp && `${Math.round(apiData.main.temp - 273.15)}° C`}
+                          {apiData?.main?.temp && `${isCelsius ? convertToCelsius(apiData.main.temp) : convertToFahrenheit(apiData.main.temp)} `}
+                          <button
+                            className="border border-black p-1 rounded-md"
+                            onClick={handleTemperatureConversion}
+                          >
+                            {isCelsius ? ' °C' : ' °F'}
+                          </button>
                         </h2>
+
 
 
                       </div>
